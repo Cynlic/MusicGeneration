@@ -11,6 +11,14 @@
 (define stages '('a 'b 'c))
 (define stages2 '("a" "b" "c"))
 
+(define stages3 (list "a'" "ais'" "b'" "c'" "cis'" "d'" "dis'" "e'" "f'" "fis'" "g'" "gis'" "a''" "ais''" "b''" ))
+(define listas (list '(0.125 0.125 0.125 0.125 0.125 0.125 0.125 0.125) '(0.125 0.125 0.125 0.125 0.125 0.125 0.125 0.125) '(0.125 0.125 0.125 0.125 0.125 0.125 0.125 0.125) '(0.125 0.125 0.125 0.125 0.125 0.125 0.125 0.125) '(0.125 0.125 0.125 0.125 0.125 0.125 0.125 0.125) '(0.125 0.125 0.125 0.125 0.125 0.125 0.125 0.125) '(0.125 0.125 0.125 0.125 0.125 0.125 0.125 0.125)))
+
+(define listab  '(0.125 0.125 0.125 0.125 0.125 0.125 0.125 0.125))
+
+
+
+
 ; this function should take a markov chain and a current stage, and pass back t he same chain with a new stage
 (define list-test (list '('a 0.3 0.2 0.5) '('b 0.2 0.4 0.4) '('c 0.1 0.5 0.4)))
 (define test-chain (markov list-test))
@@ -22,26 +30,11 @@
           [chain (rest (rest chain))]
           [_ (match-markov (rest chain) item)]))))
 
-#| (define (random-position list-of-percents list-of-stages)
-  (let ([x (random 100)]
-        [sorted-list (map (lambda (number) (* 100 number))
-                          (sort list-of-percents <))]
-        [combined-list (interpose (map (lambda (number)
-                                         (* 100 number))
-                                       list-of-percents)
-                                  list-of-stages)])
-    (if (percent-match? (flatten (add-2 sorted-list 0)) x)
-        (assoc (percentify sorted-list
-                           (flatten (add-2 sorted-list 0)) x) combined-list)
-        (error 'position "something's gone wrong")))) |#
-
 (define (random-position list-of-percents list-of-stages)
   (let ([x (random 100)]
         [sorted-list (map (lambda (number) (* 100 number))
                           (sort list-of-percents <))]
-        [combined-list (interpose (map (lambda (number)
-                                         (* 100 number))
-                                       list-of-percents)
+        [combined-list (interpose (flatten (add-2 (mult-100  list-of-percents) 0))
                                   list-of-stages)])
     (if (percent-match? (flatten (add-2 sorted-list 0)) x)
         (assoc (percentify sorted-list
@@ -67,13 +60,16 @@
 
 (define (percentify list-of-percs added-percs number)
   (if (empty? list-of-percs) 0
-      (if (<= number (first added-percs)) (first list-of-percs)
-          (percentify (rest list-of-percs) (rest  added-percs)  number))))
+      (if (<= number (first added-percs)) (first added-percs)
+          (percentify (rest list-of-percs) (rest added-percs)  number))))
 
 (define (add-2 lista prev-elem)
   (if (empty? (rest lista)) (+ (first lista) prev-elem)
       (if (= prev-elem 0) (cons (first lista)(add-2 (rest lista) (first lista)))
           (cons (+ prev-elem (first lista)) (add-2 (rest lista) (+ prev-elem (first lista)))))))
+
+(define (mult-100 lista)
+  (map (lambda (number) (* 100 number)) lista))
 
 (define percent-tests '(.25 .25 .5))
 (define percent2 '(25.0 25. 50.0))
