@@ -1,8 +1,6 @@
 #lang racket
 
 (require "markov.rkt")
-
-
 (provide makelily)
 
 
@@ -11,8 +9,20 @@
 (define chroma '("is" "" "es"))
 (define octave '(3 4 5))
 (define measure 32)
-(define stages (list "a'" "ais'" "b'" "c'" "cis'" "d'" "dis'" "e'" "f'" "fis'" "g'" "gis'" "a''" "ais''" "b''" "c''"))
-(define listas (list '(0.125 0.125 0.125 0.125 0.125 0.125 0.125 0.125) '(0.125 0.125 0.125 0.125 0.125 0.125 0.125 0.125) '(0.125 0.125 0.125 0.125 0.125 0.125 0.125 0.125) '(0.125 0.125 0.125 0.125 0.125 0.125 0.125 0.125) '(0.125 0.125 0.125 0.125 0.125 0.125 0.125 0.125) '(0.125 0.125 0.125 0.125 0.125 0.125 0.125 0.125) '(0.125 0.125 0.125 0.125 0.125 0.125 0.125 0.125) '(0.125 0.125 0.125 0.125 0.125 0.125 0.125 0.125)))
+(define aminor (list "a'" "b'" "c'"  "d'"  "e'" "f'"  "g'"  "a''"))
+(define listas (list '(0.125 0.125 0.125 0.125 0.125 0.125 0.125 0.125);1
+                     '(0.125 0.125 0.125 0.125 0.125 0.125 0.125 0.125);2 
+                     '(0.125 0.125 0.125 0.125 0.125 0.125 0.125 0.125);3
+                     '(0.125 0.125 0.125 0.125 0.125 0.125 0.125 0.125);4
+                     '(0.125 0.125 0.125 0.125 0.125 0.125 0.125 0.125);5
+                     '(0.125 0.125 0.125 0.125 0.125 0.125 0.125 0.125);6
+                     '(0.125 0.125 0.125 0.125 0.125 0.125 0.125 0.125);7
+                     '(0.125 0.125 0.125 0.125 0.125 0.125 0.125 0.125);8
+                    ; '(0.125 0.125 0.125 0.125 0.125 0.125 0.125 0.125);9
+                    ; '(0.125 0.125 0.125 0.125 0.125 0.125 0.125 0.125);10
+                    ; '(0.125 0.125 0.125 0.125 0.125 0.125 0.125 0.125);11
+                    ; '(0.125 0.125 0.125 0.125 0.125 0.125 0.125 0.125);12
+                     ))
 
 
 (define (prob num)
@@ -118,6 +128,14 @@
 (define (noteinfo x y)
   (reduce string-append (flatten (map (curryr cons " ") (zipit (makechords (numpitch (generate-pitches x))) (makedots (numdur (generate-durations y))))))))
 
+(define (noteinfo-markov x y stringa)
+  (reduce string-append (flatten
+                         (map
+                          (curryr cons " ")
+                          (zipit
+                           (flatten (markov-stages aminor listas stringa (- x 1)))
+                           (makedots (numdur (generate-durations y))))))))
+
 
 (define headings "\\header {
 title = \"Guitar Exercises\"
@@ -127,10 +145,10 @@ composer = \"Harrison Montgomery\"
 
 (define versions "\\version \"2.18.2\"")
 
-(define (makepitch x y)
+(define (makepitch x y stringa)
   (hash-popu)
-  (string-append "\\score {<< \\new Staff \\with {\\remove \"Bar_engraver\"} \\absolute {" (noteinfo x y) "}\n>>}"  ))
+  (string-append "\\score {<< \\new Staff \\with {\\remove \"Bar_engraver\"} \\absolute {" (noteinfo-markov x y stringa) "}\n>>}"  ))
 
-(define (makelily x y)
-  (string-append headings (string-append (makepitch x y) (makepitch x y) (makepitch x y) (makepitch x y)) versions))
+(define (makelily x y stringa)
+  (string-append headings (string-append (makepitch x y stringa) (makepitch x y stringa) (makepitch x y stringa) (makepitch x y stringa)) versions))
 
