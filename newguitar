@@ -1,0 +1,18 @@
+
+
+#! /bin/bash
+
+#|
+exec racket -e '(printf "Running...\n")' -u "$0" ${1+"$@e"}
+|#
+
+
+#lang racket
+(require "musicgen.rkt")
+
+(define out (open-output-file "newlily.ly" #:exists 'replace)) 
+(display (makelily 1000 1000 "a'") out)
+(close-output-port out)
+
+(system "lilypond newlily.ly")
+(system "open newlily.pdf")
